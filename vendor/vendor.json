@@ -3,16 +3,34 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "Qq7Gzany1n6gK6hpZQq9UXFhGGo=",
-			"comment": "v1.0rc1-110-g4cc2de6",
-			"path": "github.com/gin-gonic/gin",
-			"revision": "4cc2de6207f4128624cbdd16be30f64966c67c08"
+			"checksumSHA1": "GAxHfCuzqMxTOPNUAAWwY1oQwsA=",
+			"path": "git.starchasers.ovh/Starchasers/go-panel-microservice/microservice",
+			"revision": "26c5e1c0f0fc013bade06b261e1fbdc3efe53804",
+			"revisionTime": "2017-09-22T14:29:11Z"
 		},
 		{
-			"checksumSHA1": "M8Z61f8GZs6CO23wP+ekRgZEo+w=",
-			"comment": "v1.0rc1-110-g4cc2de6",
-			"path": "github.com/gin-gonic/gin/binding",
-			"revision": "4cc2de6207f4128624cbdd16be30f64966c67c08"
+			"checksumSHA1": "t+uej2kiyqRyQYguygI8t9nJH2w=",
+			"path": "github.com/SermoDigital/jose",
+			"revision": "2bd9b81ac51d6d6134fcd4fd846bd2e7347a15f9",
+			"revisionTime": "2016-12-05T22:51:55Z"
+		},
+		{
+			"checksumSHA1": "u92C5yEz1FLBeoXp8jujn3tUNFI=",
+			"path": "github.com/SermoDigital/jose/crypto",
+			"revision": "2bd9b81ac51d6d6134fcd4fd846bd2e7347a15f9",
+			"revisionTime": "2016-12-05T22:51:55Z"
+		},
+		{
+			"checksumSHA1": "FJP5enLaw1JzZNu6Fen+eEKY7Lo=",
+			"path": "github.com/SermoDigital/jose/jws",
+			"revision": "2bd9b81ac51d6d6134fcd4fd846bd2e7347a15f9",
+			"revisionTime": "2016-12-05T22:51:55Z"
+		},
+		{
+			"checksumSHA1": "3gGGWQ3PcKHE+2cVlkJmIlBfBlw=",
+			"path": "github.com/SermoDigital/jose/jwt",
+			"revision": "2bd9b81ac51d6d6134fcd4fd846bd2e7347a15f9",
+			"revisionTime": "2016-12-05T22:51:55Z"
 		},
 		{
 			"checksumSHA1": "/cPJSLLdEAWI/Mavbbe13RgSfP4=",
