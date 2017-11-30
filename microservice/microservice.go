@@ -57,6 +57,8 @@ func (panel *PanelMicroservice) ServeHTTP(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	println("!!!!!!!!!!!!!!!!!HEADER:")
+	println(r.Header)
 	t, err := jws.ParseJWTFromRequest(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
