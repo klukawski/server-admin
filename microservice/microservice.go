@@ -24,7 +24,7 @@ type PanelMicroservice struct {
 }
 
 func token() string {
-	b := make([]byte, 16)
+	b := make([]byte, 24)
 	rand.Read(b)
 	return base64.StdEncoding.EncodeToString(b)
 }
