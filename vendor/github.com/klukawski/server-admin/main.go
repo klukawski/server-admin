@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/klukawski/server-admin/microservice"
+	"github.com/heroku/go-getting-started/microservice"
 )
 
 func handleTest(w http.ResponseWriter, r *http.Request) {
