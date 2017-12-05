@@ -57,8 +57,6 @@ func (panel *PanelMicroservice) ServeHTTP(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	println("!!!!!!!!!!!!!!!!!HEADER:")
-	println(r.Header)
 	t, err := jws.ParseJWTFromRequest(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -67,7 +65,7 @@ func (panel *PanelMicroservice) ServeHTTP(w http.ResponseWriter, r *http.Request
 	}
 
 	validator := jws.NewValidator(*panel.claims, time.Minute, time.Minute, nil)
-	err = t.Validate(panel.key, crypto.SigningMethodHS512, validator)
+	err = t.Validate(panel.key, crypto.SigningMethodHS256, validator)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, err.Error())
