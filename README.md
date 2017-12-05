@@ -1,21 +1,31 @@
 # Service Management Panel: #
-Let's say that a few people bought a dedicated server to set up a few services. Every one of them wants root and SSH access, which may introduce problems like occupied ports, or someone can break someone else's service. Because of virtualization having quite an overhead, in this case we're using LXC (Linux Containers). It gives us an ability to set up multiple containers with their own IPs and environments. 
+Let's say that a few people bought a dedicated server to set up a few services. 
+Every one of them wants root and SSH access, which may introduce problems like occupied ports, 
+or someone can break someone else's service. Because of virtualization having quite an overhead, 
+in this case we're using LXC (Linux Containers). 
+It gives us an ability to set up multiple containers with their own IPs and environments.
+Those containers need to be administered, and we don't want to call someone with main container's root access just to
+restart ours, so we need some kind of panel. Also, there are people who don't own a container, but have a certain 
+service set up (i.e. nginx to host a single site). Those people must be able to perform some operations on their 
+services, like reload configs.  
 
-### Role: ###
-* Head Admin: Posiada bezpośredni dostęp do maszyny.
-  * Admin: Może zarządzać wszystkimi kontenerami w razie problemów.
-    * Container Owner: Osoba posiadająca kontener.
-    * Service Owner: Osoba posiadająca wyłącznie service.
+### Roles: ###
+* Head Admin: Has root access to main container.
+  * Admin: Can manage all containers on the server.
+    * Container Owner: Can manage their container(s) and services.
+    * Service Owner: Can manage their service(s).
 
-### Custom object'y: ###
+### Custom objects: ###
 
-* Machine: Fizyczna maszyna na której stoi LXC.
-* Container: Pojedynczy kontener LXC stojący na maszynie.
-* Service: Pojedynczy Service stworzony przez użytkownika na jego kontenerze lub stworzony przez Admina na specjalnym kontenerze dla osób posiadających tylko Service.
+* Machine: Physical machine with LXC set up on it.
+* Container: Single LXC container.
+* Service: Single service set up by user on their container or by an Admin for a service owner on a separate container.
 
-Dla testów zamiast operować na maszynie z LXC ustawimy tylko przykładowy microservice za pomocą middleware'u napisanego w go i ustawionego na heroku. Będzie on końcowo nakładką na REST API udostępniane przez [LXD](https://linuxcontainers.org/lxd/rest-api/). Do zabezpieczenia API użyte zostanie JWT na zasadzie współdzielonego pre-share'owanego klucza i jednorazowych tokenów operacji.
+For testing, instead of operating on a live LXC machine, we will set up a sample microservice using a middleware 
+written in go and set up on heroku. It will be imitating [LXD's](https://linuxcontainers.org/lxd/rest-api/) REST API,
+and taking care of request authorization with JWT. 
 
-### Symulowane endpointy: ###
+### Simulated endpoints: ###
 * /token
 * /container/\<id>
   * /container/\<id>/start
