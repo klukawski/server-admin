@@ -9,13 +9,15 @@ import (
 
 	"github.com/SermoDigital/jose/crypto"
 	"github.com/SermoDigital/jose/jws"
+	"crypto/rsa"
 )
 
 type Endpoint func(http.ResponseWriter, *http.Request)
 
 type PanelMicroservice struct {
 	server                  http.Server
-	key                     []byte
+	private					*rsa.PrivateKey
+	external				*rsa.PublicKey
 	claims                  *jws.Claims
 	tlsCertFile, tlsKeyFile string
 	Endpoints               map[string]Endpoint
@@ -33,17 +35,17 @@ func (panel *PanelMicroservice) handleToken(w http.ResponseWriter, r *http.Reque
 	fmt.Fprintf(w, "{\"token\":\"%s\"}", token)
 }
 
-func NewPanelMicroservice(address, key, tlsCertFile, tlsKeyFile string) *PanelMicroservice {
-	keyBytes, _ := base64.StdEncoding.DecodeString(key)
+func NewPanelMicroservice(address string, external *rsa.PublicKey, privKey *rsa.PrivateKey, tlsCertFile, tlsKeyFile string) *PanelMicroservice {
 	panelMicroservice := &PanelMicroservice{
 		server: http.Server{
 			Addr: address,
 		},
-		key:         keyBytes,
-		claims:      &jws.Claims{},
-		tlsCertFile: tlsCertFile,
-		tlsKeyFile:  tlsKeyFile,
-		Endpoints:   map[string]Endpoint{},
+		private:	privKey,
+		external:	external,
+		claims:     &jws.Claims{},
+		tlsCertFile:tlsCertFile,
+		tlsKeyFile: tlsKeyFile,
+		Endpoints:  map[string]Endpoint{},
 	}
 	panelMicroservice.claims.SetIssuer("panel")
 	panelMicroservice.claims.SetJWTID(token())
@@ -65,7 +67,7 @@ func (panel *PanelMicroservice) ServeHTTP(w http.ResponseWriter, r *http.Request
 	}
 
 	validator := jws.NewValidator(*panel.claims, time.Minute, time.Minute, nil)
-	err = t.Validate(panel.key, crypto.SigningMethodHS256, validator)
+	err = t.Validate(panel.external, crypto.SigningMethodRS256, validator)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, err.Error())
