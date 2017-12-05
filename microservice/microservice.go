@@ -1,8 +1,6 @@
 package microservice
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"fmt"
 	"net/http"
 	"time"
@@ -23,18 +21,6 @@ type PanelMicroservice struct {
 	Endpoints               map[string]Endpoint
 }
 
-func token() string {
-	b := make([]byte, 24)
-	rand.Read(b)
-	return base64.StdEncoding.EncodeToString(b)
-}
-
-func (panel *PanelMicroservice) handleToken(w http.ResponseWriter, r *http.Request) {
-	token, _ := panel.claims.JWTID()
-	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintf(w, "{\"token\":\"%s\"}", token)
-}
-
 func NewPanelMicroservice(address string, external *rsa.PublicKey, privKey *rsa.PrivateKey, tlsCertFile, tlsKeyFile string) *PanelMicroservice {
 	panelMicroservice := &PanelMicroservice{
 		server: http.Server{
@@ -48,17 +34,11 @@ func NewPanelMicroservice(address string, external *rsa.PublicKey, privKey *rsa.
 		Endpoints:  map[string]Endpoint{},
 	}
 	panelMicroservice.claims.SetIssuer("panel")
-	panelMicroservice.claims.SetJWTID(token())
 	panelMicroservice.server.Handler = panelMicroservice
 	return panelMicroservice
 }
 
 func (panel *PanelMicroservice) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/token" {
-		panel.handleToken(w, r)
-		return
-	}
-
 	t, err := jws.ParseJWTFromRequest(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -73,7 +53,6 @@ func (panel *PanelMicroservice) ServeHTTP(w http.ResponseWriter, r *http.Request
 		fmt.Fprint(w, err.Error())
 		return
 	}
-	panel.claims.SetJWTID(token())
 
 	endpoint, ok := panel.Endpoints[r.URL.Path]
 	if !ok {
