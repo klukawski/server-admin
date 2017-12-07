@@ -66,7 +66,7 @@ func LoadExternal(filename string) *rsa.PublicKey {
 	return key.PublicKey.(*rsa.PublicKey)
 }
 
-func generateAndSaveKeypair() {
+func GenerateAndSaveKeypair() {
 	random := rand.Reader
 	bitsize := 2048
 
