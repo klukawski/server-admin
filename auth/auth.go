@@ -1,10 +1,6 @@
-package microservice
+package auth
 
 import (
-	"fmt"
-	"net/http"
-	"time"
-
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -12,24 +8,35 @@ import (
 	"encoding/pem"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/SermoDigital/jose/crypto"
 	"github.com/SermoDigital/jose/jws"
+	"github.com/SermoDigital/jose/jwt"
 )
 
-type Endpoint func(http.ResponseWriter, *http.Request)
-
-type PanelMicroservice struct {
-	server                  http.Server
-	private                 *rsa.PrivateKey
-	external                *rsa.PublicKey
-	claims                  *jws.Claims
-	tlsCertFile, tlsKeyFile string
-	Endpoints               map[string]Endpoint
+type AuthConfig struct {
+	Validator               *jwt.Validator
+	External                *rsa.PublicKey
+	Local                   *rsa.PrivateKey
+	TlsCertFile, TlsKeyFile string
 }
 
-func loadPrivate(filename string) *rsa.PrivateKey {
+var Config = &AuthConfig{}
+
+func Auth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token, ok := jws.ParseJWTFromRequest(r)
+		if ok != nil || token.Validate(Config.External, crypto.SigningMethodRS256, Config.Validator) != nil {
+			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func LoadPrivate(filename string) *rsa.PrivateKey {
 	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatal("Error while reading local key file: ", err)
@@ -44,7 +51,7 @@ func loadPrivate(filename string) *rsa.PrivateKey {
 	return key
 }
 
-func loadExternal(filename string) *rsa.PublicKey {
+func LoadExternal(filename string) *rsa.PublicKey {
 	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatal("Error while reading external key file: ", err)
@@ -106,58 +113,4 @@ func generateAndSaveKeypair() {
 	}
 
 	log.Print("Public key generated:", publicKey)
-}
-
-func NewPanelMicroservice(address, external, privKey, tlsCertFile, tlsKeyFile string) *PanelMicroservice {
-	if _, err := os.Stat("keys/external.pub"); os.IsNotExist(err) {
-		log.Fatal("You must put external public key in ./keys/external.pub")
-	}
-
-	if _, err := os.Stat("keys/local"); os.IsNotExist(err) {
-		log.Print("Local keypair does not exist, generating now.")
-		generateAndSaveKeypair()
-	}
-	panelMicroservice := &PanelMicroservice{
-		server: http.Server{
-			Addr: address,
-		},
-		private:     loadPrivate(privKey),
-		external:    loadExternal(external),
-		claims:      &jws.Claims{},
-		tlsCertFile: tlsCertFile,
-		tlsKeyFile:  tlsKeyFile,
-		Endpoints:   map[string]Endpoint{},
-	}
-	panelMicroservice.claims.SetIssuer("panel")
-	panelMicroservice.server.Handler = panelMicroservice
-	return panelMicroservice
-}
-
-func (panel *PanelMicroservice) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	t, err := jws.ParseJWTFromRequest(r)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, err.Error())
-		return
-	}
-
-	validator := jws.NewValidator(*panel.claims, time.Minute, time.Minute, nil)
-	err = t.Validate(panel.external, crypto.SigningMethodRS256, validator)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, err.Error())
-		return
-	}
-
-	endpoint, ok := panel.Endpoints[r.URL.Path]
-	if !ok {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, "Endpoint not found")
-		return
-	}
-	endpoint(w, r)
-}
-
-func (panel *PanelMicroservice) Start() {
-	panel.server.ListenAndServe() //TLS(tlsCertFile, tlsKeyFile)
 }
