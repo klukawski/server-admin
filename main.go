@@ -25,6 +25,10 @@ func main() {
 		log.Fatal("$PORT must be set")
 	}
 
+	if _, err := os.Stat("keys/local"); err != nil {
+		auth.GenerateAndSaveKeypair()
+	}
+
 	auth.Config.Validator = jws.NewValidator(map[string]interface{}{"iss": "panel"}, time.Minute, time.Minute, nil)
 	auth.Config.External = auth.LoadExternal("keys/external.pub")
 	auth.Config.Local = auth.LoadPrivate("keys/local")
@@ -37,7 +41,7 @@ func main() {
 	r.Use(auth.Auth)
 
 	r.Get("/test", func(w http.ResponseWriter, r *http.Request) {
-		println(w, "Hello World!")
+		fmt.Fprint(w, "Hello World!")
 	})
 
 	if *routes {
