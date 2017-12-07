@@ -1,12 +1,11 @@
 {
-  "name": "Start on Heroku: Go",
+  "name": "Server Admin",
   "description": "Go Getting Started Example App",
   "keywords": [
-    "getting-started",
     "go",
-    "sample",
-    "example"
+    "server",
+    "admin"
   ],
-  "website": "http://github.com/heroku/go-getting-started",
-  "repository": "http://github.com/heroku/go-getting-started"
+  "website": "",
+  "repository": "http://github.com/klukawski/server-admin"
 }

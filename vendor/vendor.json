@@ -43,18 +43,6 @@
 			"path": "github.com/go-chi/docgen",
 			"revision": "ac43d9a63f3b58b1e82922411d2de365d896ee72",
 			"revisionTime": "2017-08-08T22:15:02Z"
-		},
-		{
-			"checksumSHA1": "97Sz5LFVsdmsCFb782ebj1EBmeY=",
-			"path": "github.com/klukawski/server-admin",
-			"revision": "1c53bbe97a0582cc271eb46bf1cb5d2b986cc555",
-			"revisionTime": "2017-12-05T15:21:31Z"
-		},
-		{
-			"checksumSHA1": "THXGqhwKRrjUGQeb6FHX5s8wAXE=",
-			"path": "github.com/klukawski/server-admin/auth",
-			"revision": "050861b80168be020779ce110433656441ca142b",
-			"revisionTime": "2017-12-07T12:12:40Z"
 		}
 	],
 	"rootPath": "github.com/klukawski/server-admin"
